@@ -3,15 +3,28 @@ import { render, fireEvent } from "@testing-library/react";
 import TodoFrom from "./TodoForm";
 
 describe('<TodoForm />', () => {
-    it('ha input and button', () => {
-        const { getByText, getByPlaceholderText } = render(<TodoFrom />);
-        getByPlaceholderText('할 일을 입력하세요'); // input이 있는지 확인
-        getByText('등록'); // button이 있는지 확인
+    const setup = (props = {}) => {
+        const utils = render(<TodoFrom {...props} />);  // ... = 있을수도 있고 없을수도 있음
+        const { getByText, getByPlaceholderText } = utils;
+        const input = getByPlaceholderText('할 일을 입력하세요'); // in이 있는지 확인
+        const button = getByText('등록'); // button이 있는지 확인
+        return {
+            ...utils,
+            input,
+            button,
+        };
+    };
+    it('has input and button', () => {
+        // const { getByText, getByPlaceholderText } = render(<TodoFrom />);
+        // getByPlaceholderText('할 일을 입력하세요'); // input이 있는지 확인
+        // getByText('등록'); // button이 있는지 확인
+        const { input, button } = setup();
+        expect(input).toBeTruthy();  // input이 있는지 확인
+        expect(button).toBeTruthy(); // button이 있는지 확인
     });
 
     it('changes input', () => {
-        const { getByPlaceholderText } = render(<TodoFrom />);
-        const input = getByPlaceholderText('할 일을 입력하세요');
+        const { input } = setup();
         fireEvent.change(input, {
             target: {
                 value: 'TDD 배우기',
@@ -22,9 +35,7 @@ describe('<TodoForm />', () => {
 
     it('calls onInsert and clears input', () => {
         const onInsert = jest.fn();
-        const { getByText, getByPlaceholderText } = render(<TodoFrom onInsert={onInsert} />);
-        const input = getByPlaceholderText('할 일을 입력하세요');
-        const button = getByText('등록');
+        const { input, button } = setup( {onInsert} );
         // change 이벤트 발생시키기
         fireEvent.change(input, {
             target: {
